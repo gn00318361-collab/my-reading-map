@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>奇遇的卡片盒筆記</title>
+<style>
+  body, html { margin: 0; padding: 0; height: 100%; overflow: hidden; font-family: "Microsoft JhengHei", sans-serif; background: #f0f2f5; }
+  #mindmap { width: 100%; height: 100%; }
+  .header {
+    position: absolute;
+    top: 20px;
+    left: 20px;
+    z-index: 100;
+    background: rgba(255, 255, 255, 0.95);
+    padding: 15px 25px;
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+    border-left: 5px solid #1877f2;
+  }
+  h2 { margin: 0 0 5px 0; color: #1c1e21; font-size: 1.2rem; }
+  p { margin: 0; color: #606770; font-size: 0.9rem; }
+  .legend { margin-top: 10px; font-size: 0.8rem; display: flex; gap: 10px; }
+  .dot { width: 10px; height: 10px; display: inline-block; border-radius: 50%; margin-right: 5px; }
+  .red { background: #d32f2f; }
+  .yellow { background: #fbc02d; }
+  .green { background: #388e3c; }
+</style>
+<script src="https://cdn.jsdelivr.net/npm/d3@7"></script>
+<script src="https://cdn.jsdelivr.net/npm/markmap-view@0.15.4"></script>
+<script src="https://cdn.jsdelivr.net/npm/markmap-lib@0.15.4/dist/browser/index.min.js"></script>
+</head>
+<body>
+
+<div class="header">
+  <h2>🗃️ 奇遇的卡片盒筆記</h2>
+  <p>依概念重複頻率分類</p>
+  <div class="legend">
+    <span><span class="dot green"></span>1次 (綠)</span>
+    <span><span class="dot yellow"></span>2次 (黃)</span>
+    <span><span class="dot red"></span>3次+ (紅)</span>
+  </div>
+</div>
+
+<svg id="mindmap"></svg>
+
+<script>
+const fbLink = "https://www.facebook.com/pop.yoyoman/";
+
+const markdown = `
+# 🌟 奇遇的思維宇宙
+
+## <span style="color:#6a1b9a">🧠 跨書對話 (隱藏的共鳴)</span>
+
+### **專注優勢，忽略雜訊**
+- **[主角模式]** (南瓜計畫)
+- **[這本書會為你帶來好運]** (贏要衝)
+- **[讓未來，變成自己喜歡的樣子]** (藍點效應)
+- **➡ 共鳴**：我們太常盯著那 10% 的爛南瓜，而忘了擴大 90% 的優勢。
+
+### **心態決定命運 (自證預言)**
+- **[這本書會為你帶來好運]** (相信就會發生)
+- **[吸管是一個洞還是兩個洞？]** (開放心態)
+- **[搶銀行應該說什麼？]** (換位思考)
+- **➡ 共鳴**：世界不是非黑即白，保持彈性才能看見機會。
+
+### **連結帶來力量**
+- **[小小孩，大情緒]** (連結比管教重要)
+- **[你總是有別的選擇]** (家長視角的轉變)
+- **[每一次出勤，都是生死瞬間]** (看見尊嚴)
+- **➡ 共鳴**：單打獨鬥有限，與人（或情緒）建立連結才能解決根本問題。
+
+### **金錢的本質 (工具 vs 目的)**
+- **[偽善賊]** (死錢 vs 活錢)
+  - *"錢要拿來改善生活，而不是堆積數字。"*
+- **[破局致富]** (金錢是相對的)
+  - *"當大家都有錢時，你就沒有優勢。"*
+- **[39歲退休]** (資產配置)
+  - *"指數投資是為了讓生活更自由。"*
+- **➡ 共鳴**：錢是手段，自由與選擇權才是目的。
+
+
+## <span style="color:#d32f2f">🔴 高頻概念 (文章索引)</span>
+
+### **大腦認知與轉念** (7)
+- [主角模式](${fbLink})
+- [讓未來，變成自己喜歡的樣子](${fbLink})
+- [這本書會為你帶來好運](${fbLink})
+- [超級傳播者](${fbLink}) *("小因大果，蝴蝶效應")*
+- [吸管是一個洞還是兩個洞？](${fbLink}) *("打破二元對立")*
+- [搶銀行應該說什麼？](${fbLink}) *("換位思考的魔力")*
+- [正念財務自由](${fbLink})
+
+### **職人精神與工作效率** (6)
+- [於是我長成不像樣的大人](${fbLink})
+- [每一次出勤，都是生死瞬間](${fbLink})
+- [改變，都是選擇](${fbLink}) *("高效槓桿，持續推進")*
+- [你累了嗎?](${fbLink}) *("找回生活的真實感")*
+- [變成自己想望的大人](${fbLink}) *("從努力轉向好玩")*
+- [2025年度回饋](${fbLink})
+
+### **親子與愛的情感連結** (5)
+- [小小孩，大情緒](${fbLink})
+- [你總是有別的選擇](${fbLink}) *("當老師變成媽媽")*
+- [爸爸和子女對話](${fbLink}) *("理財也是一種愛")*
+- [人浮於愛](${fbLink})
+- [2025年度回饋](${fbLink})
+
+### **人性黑暗與反轉** (5)
+- [最透明的故事2](${fbLink})
+- [貪婪之羊](${fbLink})
+- [偽善賊](${fbLink}) *("宮部美幸筆下的惡與善")*
+- [樹海怪談](${fbLink}) *("社會對死亡的壓抑")*
+- [人浮於愛](${fbLink})
+
+### **財富思維與策略** (4)
+- [39歲退休](${fbLink}) *("指數投資與資產配置")*
+- [破局致富](${fbLink}) *("普通人的翻身之路")*
+- [爸爸和子女對話](${fbLink}) *("買在膝蓋，賣在肩膀")*
+- [正念財務自由](${fbLink})
+
+## <span style="color:#fbc02d">🟡 萌芽概念 (2次)</span>
+### **夢想與現實的拉扯** (2)
+- [你還有在談論夢想嗎？](${fbLink}) *("唐吉訶德 vs 桑丘")*
+- [變成自己想望的大人](${fbLink})
+
+## <span style="color:#388e3c">🟢 獨立觀點 (1次)</span>
+### **文明興衰的啟示** (1)
+- [馬雅斷代史](${fbLink})
+`;
+
+const { Transformer } = window.markmap;
+const { Markmap, loadCSS, loadJS } = window.markmap;
+const transformer = new Transformer();
+const { root, features } = transformer.transform(markdown);
+if (features.styles) features.styles.forEach(loadCSS);
+if (features.scripts) features.scripts.forEach(loadJS);
+Markmap.create('#mindmap', null, root);
+</script>
+
+</body>
+</html>
