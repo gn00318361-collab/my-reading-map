@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>奇遇的思維宇宙 (完整版)</title>
+<style>
+  body, html { margin: 0; padding: 0; height: 100%; font-family: "Microsoft JhengHei", sans-serif; background: linear-gradient(135deg, #fff3e0 0%, #fce4ec 100%); }
+  #mindmap { width: 100%; height: 100%; }
+  .header {
+    position: absolute;
+    top: 20px;
+    left: 20px;
+    z-index: 100;
+    background: rgba(255, 255, 255, 0.95);
+    padding: 15px 25px;
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+    border-left: 5px solid #1877f2;
+    max-height: 80vh;
+    overflow-y: auto;
+  }
+  h2 { margin: 0 0 5px 0; color: #1c1e21; font-size: 1.2rem; }
+  p { margin: 0; color: #606770; font-size: 0.9rem; }
+  .legend { margin-top: 10px; font-size: 0.8rem; display: flex; gap: 10px; flex-wrap: wrap;}
+  .dot { width: 10px; height: 10px; display: inline-block; border-radius: 50%; margin-right: 5px; }
+  .red { background: #d32f2f; }
+  .yellow { background: #fbc02d; }
+  .green { background: #388e3c; }
+  .purple { background: #6a1b9a; }
+
+  /* Mobile List Styles */
+  #mobile-list {
+      display: none;
+      padding: 20px;
+      padding-top: 100px; /* Space for fixed header */
+      overflow-y: auto;
+      height: 100%;
+      box-sizing: border-box;
+  }
+  .accordion-item {
+      background: white;
+      margin-bottom: 10px;
+      border-radius: 10px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+      overflow: hidden;
+  }
+  .accordion-header {
+      padding: 15px;
+      background: white;
+      border-bottom: 1px solid #f0f0f0;
+      font-weight: bold;
+      color: #333;
+      cursor: pointer;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+  }
+  .accordion-header::after {
+      content: '+';
+      font-size: 1.2rem;
+      color: #999;
+  }
+  .accordion-item.active .accordion-header::after {
+      content: '-';
+  }
+  .accordion-content {
+      display: none;
+      padding: 10px 15px;
+      background: #fafafa;
+  }
+  .accordion-item.active .accordion-content {
+      display: block;
+  }
+  .sub-category {
+      font-weight: bold;
+      color: #666;
+      margin: 10px 0 5px;
+      font-size: 0.9rem;
+  }
+  .article-link {
+      display: block;
+      padding: 8px 0;
+      color: #1877f2;
+      text-decoration: none;
+      border-bottom: 1px dashed #eee;
+  }
+  .article-link:last-child { border-bottom: none; }
+
+  @media (max-width: 768px) {
+      #mindmap { display: none; }
+      #mobile-list { display: block; }
+      .header { position: fixed; width: 90%; left: 5%; top: 10px; max-height: 80px; padding: 10px 15px; } 
+      .legend { display: none; }
+  }
+</style>
+<script src="https://cdn.jsdelivr.net/npm/d3@7"></script>
+<script src="https://cdn.jsdelivr.net/npm/markmap-view@0.15.4"></script>
+<script src="https://cdn.jsdelivr.net/npm/markmap-lib@0.15.4/dist/browser/index.min.js"></script>
+</head>
+<body>
+
+<div class="header">
+  <h2>🌟 奇遇的思維宇宙</h2>
+  <p><a href="index.html" style="text-decoration:none; color:#1877f2; font-weight:bold;">🏠 回入口頁</a> | 50+ 篇筆記</p>
+  <div class="legend">
+    <span><span class="dot purple"></span>跨書對話</span>
+    <span><span class="dot red"></span>高頻主題</span>
+  </div>
+</div>
+
+<svg id="mindmap"></svg>
+
+<!-- Mobile List View -->
+<div id="mobile-list"></div>
+
+<script>
+const markdown = `
+# 🌟 奇遇的思維宇宙
+
+## <span style="color:#6a1b9a">🧠 跨書對話 (隱藏的共鳴)</span>
+
+### **專注優勢，忽略雜訊**
+- **[主角模式](blog.html#post-2026-01-25)** (南瓜計畫)
+  - *"把最有機會的果實細心關照，把爛南瓜摘除。"*
+- **[這本書會為你帶來好運](blog.html#post-2025-12-14)** (贏要衝)
+  - *"順手時大膽妄為，逆風時謹慎小心。"*
+- **[讓未來，變成自己喜歡的樣子](blog.html#post-2026-01-12)** (藍點效應)
+  - *"大腦會自動填補問題，讓我們一直看到缺點。"*
+- **➡ 共鳴**：我們太常盯著那 10% 的爛南瓜，而忘了擴大 90% 的優勢。
+
+### **心態決定命運 (自證預言)**
+- **[這本書會為你帶來好運](blog.html#post-2025-12-14)**
+  - *"你越相信自己好運，就會真的好運。"*
+- **[運 唐吉訶德的致勝秘密](blog.html#post-2025-03-16)**
+  - *"成為運氣的容器，拒絕厄運黑洞。"*
+- **[貪婪之羊](blog.html#post-2025-12-28)** (小孩篇)
+  - *"為了活下去，她們想像對方是王子 (創造實相)。"*
+- **➡ 共鳴**：無論是好運還是悲劇，往往是我們先相信了，它才發生。
+
+### **連結帶來力量**
+- **[我不要爸爸](blog.html#post-2025-11-23)** (小小孩，大情緒)
+  - *"建立連結是重要的解方，打罵只有短期有效。"*
+- **[每一次出勤，都是生死瞬間](blog.html#post-2026-02-02)**
+  - *"看見遺體的尊嚴，就是一種深層的連結。"*
+- **[出外靠朋友](blog.html#post-2025-10-24)**
+  - *"人生的驚喜，往往藏在與人的連結裡。"*
+- **➡ 共鳴**：問題往往出在「斷裂」，而解方永遠在「重新連結」。
+
+### **教育的本質 (放手與信任)**
+- **[黏巴達假日學校](blog.html#post-2025-05-04)**
+  - *"樹是孩子最好的老師，讓他們自由探索。"*
+- **[老師的第八堂課](blog.html#post-2025-05-18)**
+  - *"教育不只是教學，更是陪伴學生實踐夢想。"*
+- **[你總是有別的選擇](blog.html#post-2025-10-27)**
+  - *"從嚴格管控到副駕駛，讓學生擁有自主權。"*
+
+
+## <span style="color:#d32f2f">🔴 高頻概念 (文章索引)</span>
+
+### **大腦認知與轉念**
+- [主角模式](blog.html#post-2026-01-25)
+- [讓未來，變成自己喜歡的樣子](blog.html#post-2026-01-12)
+- [這本書會為你帶來好運](blog.html#post-2025-12-14)
+- [運 唐吉訶德的致勝秘密](blog.html#post-2025-03-16)
+- [先降噪後聚焦](blog.html#post-2025-05-25)
+- [大腦真正想要的讀書法](blog.html#post-2025-03-31)
+- [明天是一個艱難的日子](blog.html#post-2025-04-06)
+- [超級傳播者](blog.html#post-2025-07-21)
+- [吸管是一個洞還是兩個洞？](blog.html#post-2025-10-13)
+
+### **職人精神與教育現場**
+- [我在光華國小的八年](blog.html#post-2025-06-30)
+- [於是我長成不像樣的大人](stories.html#post-2026-01-18)
+- [老師的第八堂課](blog.html#post-2025-05-18)
+- [你總是有別的選擇](blog.html#post-2025-10-27)
+- [每一次出勤，都是生死瞬間](stories.html#post-2026-02-02)
+- [2025年度回饋](blog.html#post-2026-01-01)
+- [改變，都是選擇](stories.html#post-2025-09-01)
+- [人生沒有理所當然](blog.html#post-2025-02-16)
+
+### **親子教養與家庭**
+- [我不要爸爸](blog.html#post-2025-11-23)
+- [認真就不輸了](blog.html#post-2025-06-15)
+- [黏巴達假日學校](blog.html#post-2025-05-04)
+- [爸爸和子女對話](blog.html#post-2025-09-07)
+- [看看你多了解自己](blog.html#post-2025-06-29)
+- [轉轉先生](blog.html#post-2025-07-14)
+- [拒絕「危險育兒」！](blog.html#post-2025-02-23)
+
+### **人性黑暗與故事**
+- [貪婪之羊](blog.html#post-2025-12-28)
+- [怪奇韓醫院](blog.html#post-2025-04-28)
+- [茶水間](blog.html#post-2025-04-13)
+- [真幌站前便利屋](blog.html#post-2025-03-23)
+- [父親節快樂！(軌屋2)](blog.html#post-2025-08-11)
+- [萬應的恩賜](blog.html#post-2025-06-08)
+- [偽善賊](blog.html#post-2025-09-21)
+- [是上坡多還是下坡多？](blog.html#post-2025-11-17)
+- [最透明的故事2](blog.html#post-2026-01-04)
+- [那本書是](blog.html#post-2025-06-01)
+
+### **財富思維與策略**
+- [39歲退休實戰筆記](blog.html#post-2025-08-18)
+- [破局致富](blog.html#post-2025-11-02)
+- [致富的心魔](blog.html#post-2025-05-11)
+- [我的金錢之旅](blog.html#post-2025-02-10)
+
+### **自我成長與生命韌性**
+- [要翻身，先學會吃掉一頭大象](blog.html#post-2025-06-22)
+- [宇宙不是沒有安排你](blog.html#post-2025-07-09)
+- [活出生命的色彩](blog.html#post-2025-11-07)
+- [36歲！](blog.html#post-2025-10-31)
+- [企鵝也會凍死？！](blog.html#post-2025-03-03)
+
+## <span style="color:#fbc02d">🟡 萌芽概念 (2次)</span>
+### **故事的力量**
+- [小小編劇](stories.html#post-2025-11-30)
+- [125下的祕密](blog.html#post-2025-04-20)
+
+### **歷史與策略**
+- [你是爛好人嗎？](stories.html#post-2025-09-15)
+- [寶傑，你怎麼說？](blog.html#post-2025-12-08)
+
+## 🎤 故事素材庫
+
+### 📉 面對失敗/挫折
+- [跌倒的接力賽](stories.html#story-failure-1) (歸因/轉念)
+- [國中劃錯卡](stories.html#story-mistake-1) (先求有再求好)
+- [被老師罵「沒樣子」](stories.html#post-2026-01-18) (自我認同)
+- [藍點效應](blog.html#post-2026-01-12) (大腦/問題)
+
+### 🏆 領導與團隊
+- [幸運的籃球隊長 (大數盃)](stories.html#story-leadership-1) (冒名頂替/服務)
+- [無限城：智高積木](blog.html#post-2025-12-05) (創意/合作)
+- [改變，都是選擇](stories.html#post-2025-09-01) (效率/推進感)
+
+### 🛤️ 人生轉折
+- [考上老師的那一年](stories.html#story-career-1) (努力/互助)
+- [每一次出勤，都是生死瞬間](stories.html#post-2026-02-02) (認真/光芒)
+- [於是我長成不像樣的大人](stories.html#post-2026-01-18) (熱情)
+- [變成自己想望的大人](stories.html#post-2025-08-25) (長尾效應)
+
+### ❤️ 溫暖/教育愛
+- [我不要爸爸](stories.html#post-2025-11-23) (情緒連結)
+- [出外靠朋友](stories.html#post-2025-10-24) (感恩)
+
+## 📅 時間軸
+- **2026年**：每一次出勤、主角模式、我在光華的八年...
+- **2025下半年**：怪奇韓醫院、黏巴達、致富的心魔...
+- **2025上半年**：茶水間、真幌站前、運唐吉訶德...
+`;
+
+const { Transformer } = window.markmap;
+const { Markmap, loadCSS, loadJS } = window.markmap;
+const transformer = new Transformer();
+const { root, features } = transformer.transform(markdown);
+if (features.styles) features.styles.forEach(loadCSS);
+if (features.scripts) features.scripts.forEach(loadJS);
+Markmap.create('#mindmap', null, root);
+
+// --- Mobile List Renderer ---
+function renderMobileList() {
+    const lines = markdown.split('\\n');
+    const container = document.getElementById('mobile-list');
+    let currentCategory = null;
+    let currentSubCategory = null;
+    let categoryDiv = null;
+    let contentDiv = null;
+
+    lines.forEach(line => {
+        line = line.trim();
+        if (line.startsWith('## ')) {
+            // New Main Category
+            const title = line.replace('## ', '').replace(/<[^>]*>/g, '');
+            categoryDiv = document.createElement('div');
+            categoryDiv.className = 'accordion-item';
+            
+            const header = document.createElement('div');
+            header.className = 'accordion-header';
+            header.innerText = title;
+            header.onclick = function() { this.parentElement.classList.toggle('active'); };
+            
+            contentDiv = document.createElement('div');
+            contentDiv.className = 'accordion-content';
+            
+            categoryDiv.appendChild(header);
+            categoryDiv.appendChild(contentDiv);
+            container.appendChild(categoryDiv);
+        } else if (line.startsWith('### ')) {
+            // Sub Category
+            if (contentDiv) {
+                const subTitle = line.replace('### ', '').replace(/\\*\\*/g, '');
+                const subHeader = document.createElement('div');
+                subHeader.className = 'sub-category';
+                subHeader.innerText = subTitle;
+                contentDiv.appendChild(subHeader);
+            }
+        } else if (line.startsWith('- [')) {
+            // Link
+            if (contentDiv) {
+                // Extract Title and URL: - [Title](URL)
+                const match = line.match(/\[(.*?)\]\((.*?)\)/);
+                if (match) {
+                    const link = document.createElement('a');
+                    link.className = 'article-link';
+                    link.innerText = match[1];
+                    link.href = match[2];
+                    contentDiv.appendChild(link);
+                }
+            }
+        }
+    });
+}
+
+// Run render
+renderMobileList();
+
+</script>
+
+</body>
+</html>
